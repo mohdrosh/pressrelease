@@ -85,5 +85,10 @@ const server = http.createServer((req, res) => {
     }
   });
 });
-
+// Keep-alive ping to prevent Render free tier sleep
+setInterval(() => {
+  https.get('https://pressrelease-tmo5.onrender.com', (res) => {
+    console.log('Keep-alive ping:', res.statusCode);
+  }).on('error', () => {});
+}, 840000); // ping every 14 minutes
 server.listen(PORT, () => console.log(`✅ Gemini proxy running at http://localhost:${PORT}`));
