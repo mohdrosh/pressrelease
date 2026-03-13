@@ -21,6 +21,7 @@ const server = http.createServer(async (req, res) => {
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
   if (req.method === 'OPTIONS') { res.writeHead(204); res.end(); return; }
+  if (req.url === '/health') { res.writeHead(200); res.end('OK'); return; }
 
   // GET saved press releases
   if (req.method === 'GET' && req.url === '/saves') {
@@ -147,7 +148,7 @@ const server = http.createServer(async (req, res) => {
 });
 // Keep-alive ping to prevent Render free tier sleep
 setInterval(() => {
-  https.get('https://pressrelease-tmo5.onrender.com', (res) => {
+  https.get('https://pressrelease-tmo5.onrender.com/health', (res) => {
     console.log('Keep-alive ping:', res.statusCode);
   }).on('error', () => {});
 }, 840000); // ping every 14 minutes
