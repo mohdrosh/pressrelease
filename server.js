@@ -2,7 +2,7 @@ const http = require('http');
 const https = require('https');
 
 const PORT = 3000;
-const API_KEY = 'AIzaSyAmiWWImQA-I6BMozosMla120XSicg-cE4';
+const API_KEY = process.env.GEMINI_API_KEY;
 const server = http.createServer((req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
