@@ -1,14 +1,74 @@
 const http = require('http');
 const https = require('https');
+const { MongoClient } = require('mongodb');
+
+const MONGO_URI = process.env.MONGO_URI;
+const dbName = 'pressrelease';
+let db;
+
+async function connectDB(){
+  const client = await MongoClient.connect(MONGO_URI);
+  db = client.db(dbName);
+  console.log('✅ MongoDB connected');
+}
+connectDB().catch(err => console.error('MongoDB error:', err));
 
 const PORT = 3000;
 const API_KEY = process.env.GEMINI_API_KEY;
-const server = http.createServer((req, res) => {
+const server = http.createServer(async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
   if (req.method === 'OPTIONS') { res.writeHead(204); res.end(); return; }
+
+  // GET saved press releases
+  if (req.method === 'GET' && req.url === '/saves') {
+    try {
+      const saves = await db.collection('saves').find().sort({savedAt:-1}).toArray();
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify(saves));
+    } catch(e) {
+      res.writeHead(500);
+      res.end(JSON.stringify({ error: e.message }));
+    }
+    return;
+  }
+
+  // DELETE a press release
+  if (req.method === 'DELETE' && req.url.startsWith('/saves/')) {
+    const { ObjectId } = require('mongodb');
+    const id = req.url.split('/saves/')[1];
+    try {
+      await db.collection('saves').deleteOne({ _id: new ObjectId(id) });
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: true }));
+    } catch(e) {
+      res.writeHead(500);
+      res.end(JSON.stringify({ error: e.message }));
+    }
+    return;
+  }
+
+  // POST save a press release
+  if (req.method === 'POST' && req.url === '/saves') {
+    let body = '';
+    req.on('data', chunk => body += chunk);
+    req.on('end', async () => {
+      try {
+        const entry = JSON.parse(body);
+        entry.savedAt = new Date().toISOString();
+        await db.collection('saves').insertOne(entry);
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true }));
+      } catch(e) {
+        res.writeHead(500);
+        res.end(JSON.stringify({ error: e.message }));
+      }
+    });
+    return;
+  }
+
   if (req.method !== 'POST') { res.writeHead(404); res.end(); return; }
 
   let body = '';
