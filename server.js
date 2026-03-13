@@ -39,7 +39,7 @@ const server = http.createServer((req, res) => {
 
       const geminiBody = JSON.stringify({
         contents: [{ role: 'user', parts }],
-        generationConfig: { maxOutputTokens: 8192, temperature: 0.7, responseMimeType: "application/json", thinkingConfig: { thinkingBudget: 0 } }
+        generationConfig: { maxOutputTokens: 16000, temperature: 0.7, responseMimeType: "application/json", thinkingConfig: { thinkingBudget: 0 } }
       });
 
       const options = {

@@ -569,6 +569,16 @@ async function doGenerate(){
     if(!data.content){ throw new Error('Server error: '+(data.error||JSON.stringify(data))); }
     const raw=data.content.map(x=>x.text||'').join('').trim();
     let cleaned=raw.replace(/^```json\s*/,'').replace(/^```\s*/,'').replace(/\s*```$/,'').trim();
+    // Fix truncated JSON
+    try{ JSON.parse(cleaned); }catch(e){
+      cleaned=cleaned.replace(/,\s*$/, '');
+      cleaned=cleaned.replace(/:\s*"[^"]*$/, ':"..."');
+      cleaned=cleaned.replace(/:\s*$/, ':"..."');
+      const o=(cleaned.match(/{/g)||[]).length, c=(cleaned.match(/}/g)||[]).length;
+      const ob=(cleaned.match(/\[/g)||[]).length, cb=(cleaned.match(/\]/g)||[]).length;
+      for(let i=0;i<ob-cb;i++) cleaned+=']';
+      for(let i=0;i<o-c;i++) cleaned+='}';
+    }
     // Fix truncated JSON by attempting to close it
     try{
       pr=JSON.parse(cleaned);
