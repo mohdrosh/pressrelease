@@ -470,6 +470,15 @@ let glossaryData=[];
 let selectingForGloss=false;
 let glossMode='type';
 
+// Auto-load release from URL on page load
+window.addEventListener('load', async () => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const releaseId = urlParams.get('id');
+  if (releaseId) {
+    await loadSavedPR(releaseId);
+  }
+});
+
 // ── MODE SWITCH ───────────────────────────────────────────────
 function switchMode(m){
   inputMode=m; const isUp=m==='upload';
@@ -910,6 +919,7 @@ async function loadSavedPR(id){
   const entry = saves.find(s=>s._id===id);
   if(!entry) return;
   hideSavedList();
+  window.history.pushState({}, '', `?id=${id}`);
   const wG = !!(entry.pr.glossary && entry.pr.glossary.length);
   const wF = !!(entry.pr.figureConcepts && entry.pr.figureConcepts.length);
   const wI = !!(entry.pr.significance && entry.pr.significance.length);
