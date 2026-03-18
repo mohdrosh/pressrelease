@@ -687,6 +687,7 @@ function renderPR(pr,wG,wF,wI,wQ){
   glossaryData = wG&&pr.glossary ? pr.glossary.map(g=>({...g})) : [];
 
   document.getElementById('outTitle').textContent=pr.title||'プレスリリース原稿';
+  document.getElementById('outTitle').contentEditable='true';
   document.getElementById('genTime').textContent=new Date().toLocaleString('ja-JP');
 
   const futureHtml=pr.future
@@ -854,11 +855,26 @@ async function doSave(){
   const btn = document.getElementById('saveBtn');
   btn.textContent = '⏳ 保存中…'; btn.disabled=true;
   try{
+    // Capture all edited content from the DOM
+    const editedPR = {...currentPR};
+    editedPR.title = document.getElementById('outTitle').textContent.trim() || currentPR.title;
+    editedPR.summary = document.getElementById('pr-summary-txt')?.innerText.trim() || currentPR.summary;
+    editedPR.background = document.getElementById('pr-background-txt')?.innerText.trim() || currentPR.background;
+    editedPR.results = document.getElementById('pr-results-txt')?.innerText.trim() || currentPR.results;
+    editedPR.future = document.getElementById('pr-future-txt')?.innerText.trim() || currentPR.future;
+    // Update glossary definitions if edited
+    const glossItems = document.querySelectorAll('.gloss-def');
+    if(editedPR.glossary && glossItems.length > 0){
+      editedPR.glossary = editedPR.glossary.map((g, i) => ({
+        ...g,
+        definition: glossItems[i] ? glossItems[i].innerText.trim() : g.definition
+      }));
+    }
     const entry = {
-      title: currentPR.title || 'タイトル未設定',
-      institution: currentPR.institution || '',
-      date: currentPR.date || '',
-      pr: currentPR
+      title: editedPR.title || 'タイトル未設定',
+      institution: editedPR.institution || '',
+      date: editedPR.date || '',
+      pr: editedPR
     };
     await fetch('https://pressrelease-tmo5.onrender.com/saves', {
       method: 'POST',
