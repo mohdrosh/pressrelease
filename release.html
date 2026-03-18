@@ -99,8 +99,6 @@
     .pr-header{padding:16px 24px;}
   }
 </style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
 
@@ -122,7 +120,6 @@
       <div class="out-actions">
         <button class="act-btn" onclick="doCopy()">⎘ コピー</button>
         <button class="act-btn" onclick="window.print()">⎙ 印刷</button>
-        <button class="act-btn" id="pdfBtn" onclick="downloadPDF()">⬇ PDF保存</button>
         <a href="/" class="act-btn primary">← 一覧に戻る</a>
       </div>
     </div>
@@ -269,75 +266,8 @@ function renderPR(pr){
   document.getElementById('mainContent').style.display = 'block';
 }
 
-async function downloadPDF(){
-  const btn=document.getElementById('pdfBtn');
-  btn.textContent='⏳ 生成中…'; btn.disabled=true;
-  try{
-    const { jsPDF: jsPDFClass } = window.jspdf;
-    const source = document.getElementById('prGrid');
-    const clone = source.cloneNode(true);
-    clone.style.cssText = 'background:#ffffff;padding:32px;width:900px;font-family:sans-serif;';
-    clone.querySelectorAll('*').forEach(el => {
-      el.style.backdropFilter = 'none';
-      el.style.webkitBackdropFilter = 'none';
-      el.style.animation = 'none';
-      el.style.transition = 'none';
-      el.style.backgroundImage = 'none';
-      el.style.boxShadow = 'none';
-      el.style.textShadow = 'none';
-      const bg = window.getComputedStyle(el).backgroundColor;
-      if(bg && bg !== 'rgba(0, 0, 0, 0)') el.style.backgroundColor = bg;
-      el.style.color = window.getComputedStyle(el).color;
-    });
-    clone.querySelectorAll('p, div, span, h1, h2, h3, h4').forEach(el => {
-      const c = window.getComputedStyle(el).color;
-      const rgb = c.match(/\d+/g);
-      if(rgb){
-        const brightness = (parseInt(rgb[0])*299 + parseInt(rgb[1])*587 + parseInt(rgb[2])*114)/1000;
-        if(brightness > 200) el.style.color = '#333333';
-      }
-    });
-    clone.style.position = 'absolute';
-    clone.style.top = '-9999px';
-    clone.style.left = '0';
-    document.body.appendChild(clone);
-    const canvas = await html2canvas(clone, {
-      scale: 3, useCORS: true, backgroundColor: '#ffffff',
-      windowWidth: 900, logging: false, imageTimeout: 0,
-      removeContainer: true, width: 900, height: clone.scrollHeight
-    });
-    document.body.removeChild(clone);
-    const doc = new jsPDFClass({ orientation:'portrait', unit:'pt', format:'a4', compress: true });
-    const pageW = doc.internal.pageSize.getWidth();
-    const pageH = doc.internal.pageSize.getHeight();
-    const margin = 24;
-    const contentW = pageW - margin * 2;
-    const scaledH = (canvas.height * contentW) / canvas.width;
-    const totalPages = Math.ceil(scaledH / (pageH - margin * 2));
-    for(let i = 0; i < totalPages; i++){
-      if(i > 0) doc.addPage();
-      const srcY = i * ((pageH - margin * 2) / scaledH) * canvas.height;
-      const srcH = Math.min(((pageH - margin * 2) / scaledH) * canvas.height, canvas.height - srcY);
-      const pageCanvas = document.createElement('canvas');
-      pageCanvas.width = canvas.width;
-      pageCanvas.height = Math.ceil(srcH);
-      const ctx = pageCanvas.getContext('2d');
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(0, 0, pageCanvas.width, pageCanvas.height);
-      ctx.drawImage(canvas, 0, srcY, canvas.width, srcH, 0, 0, canvas.width, srcH);
-      const sliceData = pageCanvas.toDataURL('image/png');
-      const sliceH = (pageCanvas.height / canvas.height) * scaledH;
-      doc.addImage(sliceData, 'PNG', margin, margin, contentW, sliceH);
-    }
-    const filename = (document.getElementById('outTitle').textContent||'pressrelease').replace(/[^\w\u3040-\u9fff]/g,'_').substring(0,50)+'.pdf';
-    doc.save(filename);
-  }catch(e){
-    console.error('PDF error:', e);
-    alert('PDF生成に失敗しました: '+e.message);
-  }
-  btn.textContent='⬇ PDF保存';
-  btn.disabled=false;
-}
+// Load release from URL
+window.addEventListener('load', async () => {
   const urlParams = new URLSearchParams(window.location.search);
   const id = urlParams.get('id');
   if(!id){
@@ -354,7 +284,8 @@ async function downloadPDF(){
     renderPR(entry.pr);
   }catch(e){
     document.getElementById('loadingDiv').textContent = '読み込みに失敗しました。';
-  };
+  }
+});
 </script>
 </body>
 </html>
