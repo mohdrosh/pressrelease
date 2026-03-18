@@ -99,6 +99,8 @@
     .pr-header{padding:16px 24px;}
   }
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
 
@@ -336,6 +338,8 @@ async function downloadPDF(){
   btn.textContent = '⬇ PDF保存';
   btn.disabled = false;
 }
+
+window.addEventListener('load', async () => {
   const urlParams = new URLSearchParams(window.location.search);
   const id = urlParams.get('id');
   if(!id){
@@ -353,9 +357,7 @@ async function downloadPDF(){
   }catch(e){
     document.getElementById('loadingDiv').textContent = '読み込みに失敗しました。';
   }
-;
+});
 </script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </body>
 </html>
