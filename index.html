@@ -320,7 +320,9 @@ footer{background:var(--ink);padding:36px 80px;display:flex;align-items:center;j
     <span class="h-badge">PRESS RELEASE SYSTEM</span>
     <button class="h-btn" onclick="showSavedList()" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.25);margin-right:8px;">📁 保存済みリリース</button>
     <button class="h-btn" onclick="document.getElementById('app').scrollIntoView({behavior:'smooth'})">今すぐ生成する →</button>
-    <button class="h-btn" id="loginBtn" onclick="isLoggedIn ? handleLogout() : showLoginModal()" style="background:var(--accent);margin-left:8px;">ログイン</button>
+    <button class="h-btn" id="loginBtn" onclick="isLoggedIn ? null : showLoginModal()" style="background:var(--accent);margin-left:8px;">ログイン</button>
+    <span id="welcomeMsg" style="display:none;font-size:12px;color:rgba(255,255,255,.7);font-family:'Noto Sans JP',sans-serif;margin-left:8px;"></span>
+    <button id="logoutBtn" onclick="handleLogout()" style="display:none;background:rgba(255,60,60,.15);border:1px solid rgba(255,60,60,.3);color:rgba(255,120,120,.9);padding:9px 18px;font-family:'Noto Sans JP',sans-serif;font-size:12px;font-weight:500;cursor:pointer;border-radius:3px;margin-left:8px;transition:all .2s;" onmouseover="this.style.background='rgba(255,60,60,.25)'" onmouseout="this.style.background='rgba(255,60,60,.15)'">ログアウト</button>
   </div>
 </header>
 
@@ -509,9 +511,14 @@ function handleLogin(){
     isLoggedIn = true;
     document.getElementById('loginModal').style.display = 'none';
     document.getElementById('loginBtn').textContent = '👤 ' + u;
-    document.getElementById('loginBtn').style.background = 'rgba(255,255,255,.15)';
+    document.getElementById('loginBtn').style.background = 'rgba(255,255,255,.08)';
+    document.getElementById('loginBtn').style.border = '1px solid rgba(255,255,255,.2)';
+    document.getElementById('loginBtn').style.cursor = 'default';
+    document.getElementById('loginBtn').onclick = null;
+    document.getElementById('logoutBtn').style.display = 'inline-block';
+    document.getElementById('welcomeMsg').textContent = 'ようこそ、' + u + ' さん 👋';
+    document.getElementById('welcomeMsg').style.display = 'inline-block';
     document.getElementById('loginError').style.display = 'none';
-    // If they were trying to upload, trigger the file input
     if(pendingUpload){
       pendingUpload = false;
       document.getElementById('fileInput').click();
@@ -525,6 +532,8 @@ function handleLogout(){
   isLoggedIn = false;
   document.getElementById('loginBtn').textContent = 'ログイン';
   document.getElementById('loginBtn').style.background = 'var(--accent)';
+  document.getElementById('logoutBtn').style.display = 'none';
+  document.getElementById('welcomeMsg').style.display = 'none';
 }
 
 function showLoginModal(){
