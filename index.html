@@ -909,11 +909,24 @@ async function loadSavedPR(id){
   const saves = await fetch('https://pressrelease-tmo5.onrender.com/saves').then(r=>r.json()).catch(()=>[]);
   const entry = saves.find(s=>s._id===id);
   if(!entry) return;
-  hideSavedList();
+  window.history.pushState({}, '', `?id=${id}`);
   const wG = !!(entry.pr.glossary && entry.pr.glossary.length);
   const wF = !!(entry.pr.figureConcepts && entry.pr.figureConcepts.length);
   const wI = !!(entry.pr.significance && entry.pr.significance.length);
   const wQ = !!(entry.pr.quote);
+
+  // Show content inside the panel itself
+  const container = document.getElementById('savedListContainer');
+  container.innerHTML = `
+    <button onclick="showSavedList()" style="margin-bottom:32px;background:transparent;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.6);padding:8px 18px;border-radius:3px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;font-size:13px;">← 一覧に戻る</button>
+    <div style="background:var(--paper);border-radius:8px;padding:40px;overflow:auto;">
+      <div class="out-eyebrow" style="color:var(--accent);font-size:10px;letter-spacing:.2em;text-transform:uppercase;margin-bottom:8px;font-family:'DM Mono',monospace;">プレスリリース原稿</div>
+      <div class="out-title" id="outTitle" style="font-family:'Noto Serif JP',serif;font-size:24px;font-weight:900;color:var(--ink);margin-bottom:4px;"></div>
+      <div class="out-meta" style="font-size:11px;color:#888;margin-bottom:32px;">SPring-8 × SACLA · <span id="genTime"></span></div>
+      <div class="pr-grid" id="prGrid"></div>
+    </div>
+  `;
+
   renderPR(entry.pr, wG, wF, wI, wQ);
 }
 
