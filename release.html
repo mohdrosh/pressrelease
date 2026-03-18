@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>プレスリリース</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Noto+Serif+JP:wght@400;700;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0a0c14;
+    --paper:#f5f6f8;
+    --white:#ffffff;
+    --muted:#6b7280;
+    --accent:#2e6fc4;
+    --accent-bright:#4a90e2;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Noto Sans JP',sans-serif;background:var(--paper);color:var(--ink);}
+
+  /* HEADER */
+  .pr-header{background:var(--ink);padding:16px 48px;display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid var(--accent);}
+  .pr-header-logo{font-size:16px;font-weight:700;color:var(--white);}
+  .pr-header-logo em{font-style:normal;color:var(--accent-bright);}
+  .pr-header-back{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.7);padding:8px 18px;border-radius:4px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;font-size:13px;text-decoration:none;transition:background .2s;}
+  .pr-header-back:hover{background:rgba(255,255,255,.15);}
+
+  /* MAIN */
+  .pr-main{max-width:1200px;margin:0 auto;padding:80px 48px;}
+
+  /* OUT HEADER */
+  .out-hdr{display:flex;align-items:flex-start;justify-content:space-between;padding-bottom:32px;border-bottom:1px solid rgba(10,12,20,.1);margin-bottom:44px;gap:24px;flex-wrap:wrap;}
+  .out-eyebrow{font-size:10px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);margin-bottom:8px;font-family:'DM Mono',monospace;}
+  .out-title{font-family:'Noto Serif JP',serif;font-size:28px;font-weight:900;color:var(--ink);line-height:1.3;margin-bottom:6px;}
+  .out-meta{font-size:11px;color:var(--muted);letter-spacing:.06em;font-family:'DM Mono',monospace;}
+  .out-actions{display:flex;gap:10px;flex-wrap:wrap;}
+  .act-btn{padding:10px 20px;font-family:'Noto Sans JP',sans-serif;font-size:12px;font-weight:500;border-radius:3px;cursor:pointer;transition:all .2s;border:1px solid rgba(10,12,20,.12);background:transparent;color:var(--ink);letter-spacing:.04em;}
+  .act-btn:hover{background:var(--ink);color:var(--white);border-color:var(--ink);}
+  .act-btn.primary{background:var(--ink);color:var(--white);border-color:var(--ink);}
+  .act-btn.primary:hover{background:var(--accent);border-color:var(--accent);}
+  .edit-hint{font-size:11px;color:rgba(10,12,20,.28);display:flex;align-items:center;gap:6px;margin-bottom:36px;font-family:'DM Mono',monospace;}
+  .edit-hint::before{content:'✏';}
+
+  /* PR GRID */
+  .pr-grid{display:grid;grid-template-columns:1fr 340px;gap:48px;align-items:start;}
+  .pr-block{margin-bottom:48px;padding-bottom:48px;border-bottom:1px solid rgba(10,12,20,.06);}
+  .pr-block:last-child{border-bottom:none;}
+  .blk-lbl{font-size:9px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);margin-bottom:14px;display:flex;align-items:center;gap:10px;font-family:'DM Mono',monospace;}
+  .blk-lbl::after{content:'';flex:1;height:1px;background:rgba(10,12,20,.07);}
+  .pr-h1{font-family:'Noto Serif JP',serif;font-size:26px;font-weight:900;color:var(--ink);line-height:1.4;margin-bottom:10px;}
+  .pr-dateline{font-size:11px;color:var(--muted);letter-spacing:.06em;margin-bottom:20px;font-family:'DM Mono',monospace;}
+  .summary-box{background:linear-gradient(135deg,#edf2fb,#f0f4fc);border-left:3px solid var(--accent);padding:20px 24px;border-radius:0 4px 4px 0;}
+  .summary-box-lbl{font-size:9px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;font-family:'DM Mono',monospace;}
+  .summary-box-txt{font-family:'Noto Serif JP',serif;font-size:15px;line-height:1.85;color:var(--ink);font-weight:600;font-style:italic;}
+  .pr-body{font-size:14px;line-height:2.1;color:#3a3e4a;font-weight:300;}
+  .pr-body p{margin-bottom:16px;}
+  .paper-info-box{background:#f8f9fc;border:1px solid rgba(10,12,20,.08);border-radius:4px;padding:20px 24px;font-size:13px;line-height:2;color:#3a3e4a;}
+  .paper-info-box div{border-bottom:1px solid rgba(10,12,20,.06);padding:6px 0;}
+  .paper-info-box div:last-child{border-bottom:none;}
+  .quote-box{background:var(--ink);padding:26px 26px 26px 30px;border-radius:3px;border-left:3px solid var(--accent-bright);}
+  .quote-txt{font-family:'Noto Serif JP',serif;font-size:15px;color:var(--white);line-height:1.9;font-weight:400;font-style:italic;margin-bottom:12px;}
+  .quote-author{font-size:11px;color:rgba(255,255,255,.38);font-family:'DM Mono',monospace;}
+  .sig-item{display:flex;gap:14px;margin-bottom:14px;align-items:flex-start;}
+  .sig-dot{width:28px;height:28px;border-radius:50%;background:rgba(46,111,196,.1);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;margin-top:2px;}
+  .sig-txt{font-size:13px;color:var(--ink);line-height:1.7;font-weight:400;}
+  .s-card{border:1px solid rgba(10,12,20,.1);border-radius:4px;overflow:hidden;margin-bottom:20px;}
+  .s-card-hd{background:#f0f3f8;padding:11px 16px;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid rgba(10,12,20,.08);display:flex;align-items:center;gap:8px;font-family:'DM Mono',monospace;}
+  .s-card-bd{padding:16px;}
+  .fig-concept-card{background:#edf1f8;border:1px dashed rgba(46,111,196,.25);border-radius:4px;padding:18px;margin-bottom:12px;}
+  .fig-concept-title{font-size:12px;font-weight:700;color:var(--ink);margin-bottom:6px;}
+  .fig-concept-desc{font-size:11px;color:var(--muted);line-height:1.7;font-weight:300;font-style:italic;}
+  .fig-concept-icon{font-size:20px;margin-bottom:7px;}
+  .note-item{display:flex;gap:8px;font-size:11px;color:var(--muted);line-height:1.7;margin-bottom:10px;font-weight:300;}
+  .note-bullet{color:var(--accent);flex-shrink:0;margin-top:2px;}
+  .gloss-item{padding:14px 0;border-bottom:1px solid rgba(10,12,20,.06);}
+  .gloss-item:last-child{border-bottom:none;}
+  .gloss-term{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:6px;display:flex;align-items:center;gap:8px;}
+  .gloss-num{font-family:'DM Mono',monospace;font-size:9px;font-weight:700;color:var(--white);background:var(--accent);min-width:20px;height:20px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;padding:0 5px;}
+  .gloss-badge{font-size:8px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);border:1px solid rgba(46,111,196,.3);padding:1px 7px;border-radius:1px;font-family:'DM Mono',monospace;}
+  .gloss-def{font-size:12px;color:var(--muted);line-height:1.75;font-weight:300;}
+  .gloss-ref{display:inline;cursor:pointer;border-bottom:1px dashed rgba(46,111,196,.5);color:inherit;border-radius:2px;padding:0 1px;}
+  .gloss-ref .gnote{font-size:9.5px;color:var(--accent);font-family:'DM Mono',monospace;font-weight:700;vertical-align:super;line-height:0;margin-left:1px;}
+
+  /* LOADING */
+  .loading{text-align:center;padding:120px 48px;font-family:'Noto Serif JP',serif;font-size:20px;color:var(--muted);}
+
+  /* FOOTER */
+  footer{background:var(--ink);padding:36px 48px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid rgba(255,255,255,.05);flex-wrap:wrap;gap:16px;margin-top:80px;}
+  .foot-logo{font-size:16px;font-weight:700;color:var(--white);}
+  .foot-logo em{font-style:normal;color:var(--accent-bright);}
+  .foot-copy{font-size:11px;color:rgba(255,255,255,.2);font-family:'DM Mono',monospace;}
+
+  @media(max-width:960px){
+    .pr-main{padding:40px 24px;}
+    .pr-grid{grid-template-columns:1fr;}
+    .pr-header{padding:16px 24px;}
+  }
+</style>
+</head>
+<body>
+
+<header class="pr-header">
+  <div class="pr-header-logo">SPring-8 <em>×</em> SACLA</div>
+  <a href="/" class="pr-header-back">← 一覧に戻る</a>
+</header>
+
+<div id="loadingDiv" class="loading">読み込み中…</div>
+
+<div id="mainContent" style="display:none;">
+  <div class="pr-main">
+    <div class="out-hdr">
+      <div>
+        <div class="out-eyebrow">プレスリリース原稿</div>
+        <div class="out-title" id="outTitle"></div>
+        <div class="out-meta">SPring-8 × SACLA プレスリリース生成システム · <span id="genTime"></span></div>
+      </div>
+      <div class="out-actions">
+        <button class="act-btn" onclick="doCopy()">⎘ コピー</button>
+        <button class="act-btn" onclick="window.print()">⎙ 印刷</button>
+        <a href="/" class="act-btn primary">← 一覧に戻る</a>
+      </div>
+    </div>
+    <div class="edit-hint">テキストをクリックして直接編集できます</div>
+    <div class="pr-grid" id="prGrid"></div>
+  </div>
+
+  <footer>
+    <div class="foot-logo">SPring-8 <em>×</em> SACLA</div>
+    <div class="foot-copy">© 2025 SPring-8 / SACLA · プレスリリース自動生成システム</div>
+  </footer>
+</div>
+
+<script>
+let glossaryData = [];
+
+function toFullWidth(n){
+  const map={'1':'１','2':'２','3':'３','4':'４','5':'５','6':'６','7':'７','8':'８','9':'９','0':'０'};
+  return String(n).split('').map(c=>map[c]||c).join('');
+}
+
+function escapeRegex(s){ return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'); }
+
+function injectGlossRefs(html, term, index){
+  const noteLabel=`注${toFullWidth(index)}）`;
+  const wrapped=`<span class="gloss-ref" onclick="jumpToGloss(${index})" title="用語解説：${term}">${term}<span class="gnote">${noteLabel}</span></span>`;
+  const re=new RegExp(`(${escapeRegex(term)})`,'g');
+  let firstDone=false;
+  return html.replace(re,(match,p1,offset,str)=>{
+    if(firstDone) return match;
+    const before=str.slice(0,offset);
+    const opens=(before.match(/</g)||[]).length;
+    const closes=(before.match(/>/g)||[]).length;
+    if(opens>closes) return match;
+    if(before.lastIndexOf('class="gloss-ref"')>before.lastIndexOf('</span>')) return match;
+    firstDone=true;
+    return wrapped;
+  });
+}
+
+function applyAllGlossRefs(){
+  const targets=['pr-summary-txt','pr-background-txt','pr-results-txt','pr-future-txt'];
+  targets.forEach(id=>{
+    const el=document.getElementById(id);
+    if(!el) return;
+    let html=el.innerHTML;
+    html=html.replace(/<span class="gloss-ref"[^>]*>(.*?)<span class="gnote">.*?<\/span><\/span>/g,'$1');
+    glossaryData.forEach((g,i)=>{
+      if(!g.term) return;
+      html=injectGlossRefs(html, g.term, i+1);
+    });
+    el.innerHTML=html;
+  });
+}
+
+function jumpToGloss(index){
+  const el=document.getElementById(`gloss-item-${index}`);
+  if(!el) return;
+  el.scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+function doCopy(){
+  navigator.clipboard.writeText(document.getElementById('prGrid').innerText);
+  alert('クリップボードにコピーしました。');
+}
+
+function renderPR(pr){
+  const wG = !!(pr.glossary && pr.glossary.length);
+  const wF = !!(pr.figureConcepts && pr.figureConcepts.length);
+  const wI = !!(pr.significance && pr.significance.length);
+  const wQ = !!(pr.quote);
+
+  glossaryData = wG ? pr.glossary.map(g=>({...g})) : [];
+
+  document.getElementById('outTitle').textContent = pr.title || 'プレスリリース原稿';
+  document.getElementById('genTime').textContent = new Date().toLocaleString('ja-JP');
+  document.title = pr.title || 'プレスリリース';
+
+  const futureHtml = pr.future
+    ? `<div class="pr-block"><div class="blk-lbl">今後の展開</div><div class="pr-body" id="pr-future-txt" contenteditable="true">${(pr.future||'').split('\n').filter(Boolean).map(p=>`<p>${p}</p>`).join('')}</div></div>`
+    : '';
+
+  const paperInfoHtml = pr.paperInfo
+    ? `<div class="pr-block"><div class="blk-lbl">論文情報</div><div class="paper-info-box"><div><strong>論文タイトル：</strong>${pr.paperInfo.title||''}</div><div><strong>著者：</strong>${pr.paperInfo.authors||''}</div><div><strong>掲載誌：</strong>${pr.paperInfo.journal||''}</div><div><strong>DOI：</strong>${pr.paperInfo.doi||''}</div></div></div>`
+    : '';
+
+  const impactHtml = wI && pr.significance
+    ? `<div class="pr-block"><div class="blk-lbl">社会的意義・波及効果</div>${pr.significance.map(s=>`<div class="sig-item"><div class="sig-dot">${s.icon||'✦'}</div><div class="sig-txt">${s.text}</div></div>`).join('')}</div>`
+    : '';
+
+  const quoteHtml = wQ && pr.quote
+    ? `<div class="pr-block"><div class="blk-lbl">研究者コメント</div><div class="quote-box"><div class="quote-txt">「${pr.quote.text}」</div><div class="quote-author">—— ${pr.quote.author}</div></div></div>`
+    : '';
+
+  const figHtml = wF && pr.figureConcepts
+    ? pr.figureConcepts.map((f,i)=>`<div class="fig-concept-card"><div class="fig-concept-icon">${['📊','🔬','🧬'][i]||'🔬'}</div><div class="fig-concept-title">図${i+1}：${f.title}</div><div class="fig-concept-desc">${f.description}</div></div>`).join('')
+    : '';
+
+  const glossaryHtml = wG
+    ? `<div class="pr-block"><div class="blk-lbl">用語解説</div>${glossaryData.map((g,i)=>`
+        <div class="gloss-item" id="gloss-item-${i+1}">
+          <div class="gloss-term">
+            <span class="gloss-num">注${toFullWidth(i+1)}）</span>
+            ${g.term}
+            <span class="gloss-badge">用語</span>
+          </div>
+          <div class="gloss-def">${g.definition}</div>
+        </div>`).join('')}</div>`
+    : '';
+
+  document.getElementById('prGrid').innerHTML = `
+    <div>
+      <div class="pr-block">
+        <div class="blk-lbl">タイトル・要約</div>
+        <div class="pr-h1" contenteditable="true">${pr.title}</div>
+        <div class="pr-dateline">${pr.institution||'研究機関'} · ${pr.date||'2025年'}</div>
+        <div class="summary-box">
+          <div class="summary-box-lbl">サマリー</div>
+          <div class="summary-box-txt" id="pr-summary-txt" contenteditable="true">${pr.summary}</div>
+        </div>
+      </div>
+      <div class="pr-block">
+        <div class="blk-lbl">研究の背景</div>
+        <div class="pr-body" id="pr-background-txt" contenteditable="true">${(pr.background||'').split('\n').filter(Boolean).map(p=>`<p>${p}</p>`).join('')}</div>
+      </div>
+      <div class="pr-block">
+        <div class="blk-lbl">研究内容と成果</div>
+        <div class="pr-body" id="pr-results-txt" contenteditable="true">${(pr.results||'').split('\n').filter(Boolean).map(p=>`<p>${p}</p>`).join('')}</div>
+      </div>
+      ${futureHtml}
+      ${impactHtml}
+      ${quoteHtml}
+      ${paperInfoHtml}
+      ${glossaryHtml}
+    </div>
+    <div>
+      ${wF && pr.figureConcepts ? `<div class="s-card"><div class="s-card-hd">🎨 図のコンセプト提案</div><div class="s-card-bd">${figHtml}</div></div>` : ''}
+      <div class="s-card"><div class="s-card-hd">⚠️ 注意事項</div><div class="s-card-bd"><div class="note-item"><span class="note-bullet">✦</span>本原稿はドラフトです。研究者・所属機関による確認と最終承認が必要です。</div><div class="note-item"><span class="note-bullet">✦</span>すべての事実関係は原著論文と照合してください。</div><div class="note-item"><span class="note-bullet">✦</span>論文掲載後は著作権が出版社に移転されます。論文中の図の転用はできません。</div></div></div>
+    </div>`;
+
+  if(wG) applyAllGlossRefs();
+
+  document.getElementById('loadingDiv').style.display = 'none';
+  document.getElementById('mainContent').style.display = 'block';
+}
+
+// Load release from URL
+window.addEventListener('load', async () => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const id = urlParams.get('id');
+  if(!id){
+    document.getElementById('loadingDiv').textContent = 'IDが見つかりません。';
+    return;
+  }
+  try{
+    const saves = await fetch('https://pressrelease-tmo5.onrender.com/saves').then(r=>r.json());
+    const entry = saves.find(s=>s._id===id);
+    if(!entry){
+      document.getElementById('loadingDiv').textContent = 'プレスリリースが見つかりません。';
+      return;
+    }
+    renderPR(entry.pr);
+  }catch(e){
+    document.getElementById('loadingDiv').textContent = '読み込みに失敗しました。';
+  }
+});
+</script>
+</body>
+</html>
