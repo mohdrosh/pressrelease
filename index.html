@@ -883,7 +883,12 @@ async function doSave(){
     });
     btn.textContent = '✓ 保存済み';
     btn.style.background = '#0f5c2e';
-    setTimeout(()=>{ btn.textContent = '💾 保存する'; btn.style.background = '#1a7a3c'; btn.disabled=false; }, 2000);
+    setTimeout(()=>{ 
+      btn.textContent = '💾 保存する'; 
+      btn.style.background = '#1a7a3c'; 
+      btn.disabled=false;
+      switchPage('releases');
+    }, 1000);
   }catch(e){
     alert('保存に失敗しました: '+e.message);
     btn.textContent = '💾 保存する'; btn.disabled=false;
@@ -950,41 +955,44 @@ async function openReleaseDetail(id) {
   const entry = saves.find(s=>s._id===id);
   if (!entry) return;
   window.history.pushState({}, '', `?id=${id}`);
+
+  // Hide releases list, show detail view
   document.getElementById('savedListContainer').style.display = 'none';
-  const detailView = document.getElementById('releaseDetailView');
-  detailView.style.display = 'block';
+  document.getElementById('releaseDetailView').style.display = 'block';
+
   const wG = !!(entry.pr.glossary && entry.pr.glossary.length);
   const wF = !!(entry.pr.figureConcepts && entry.pr.figureConcepts.length);
   const wI = !!(entry.pr.significance && entry.pr.significance.length);
   const wQ = !!(entry.pr.quote);
 
-  // Hide the main output wrap and show detail content
-  const mainOutput = document.getElementById('outputWrap');
-  if (mainOutput) mainOutput.style.display = 'none';
-
-  // Set up the detail content area with all needed elements
+  // Render into the detail content area
   const content = document.getElementById('releaseDetailContent');
-  content.innerHTML = `
-    <div class="out-hdr">
-      <div>
-        <div class="out-eyebrow">生成されたプレスリリース原稿</div>
-        <div class="out-title" id="outTitle"></div>
-        <div class="out-meta">SPring-8 × SACLA プレスリリース生成システム · <span id="genTime"></span></div>
-      </div>
-      <div class="out-actions">
-        <button class="act-btn" onclick="doCopy()">⎘ コピー</button>
-        <button class="act-btn" onclick="window.print()">⎙ 印刷</button>
-        <button class="act-btn primary" onclick="closeReleaseDetail()">← 一覧に戻る</button>
-      </div>
-    </div>
-    <div class="edit-hint">テキストをクリックして直接編集できます</div>
-    <div class="pr-grid" id="prGrid"></div>
-  `;
+  content.innerHTML = '';
+
+  // Temporarily move outputWrap into detail content, render, then show
+  const outputWrap = document.getElementById('outputWrap');
+  outputWrap.classList.remove('on');
+  content.appendChild(outputWrap);
+
+  // Update save button to just show saved state
+  const saveBtn = document.getElementById('saveBtn');
+  if (saveBtn) { saveBtn.style.display = 'none'; }
 
   renderPR(entry.pr, wG, wF, wI, wQ);
+  outputWrap.classList.add('on');
 }
 
 function closeReleaseDetail() {
+  // Move outputWrap back to its original place in the document
+  const outputWrap = document.getElementById('outputWrap');
+  const saveBtn = document.getElementById('saveBtn');
+  if (saveBtn) saveBtn.style.display = '';
+  outputWrap.classList.remove('on');
+
+  // Find the load overlay and insert outputWrap after it
+  const loadOverlay = document.getElementById('loadOverlay');
+  loadOverlay.parentNode.insertBefore(outputWrap, loadOverlay.nextSibling);
+
   document.getElementById('releaseDetailView').style.display = 'none';
   document.getElementById('savedListContainer').style.display = 'block';
   window.history.pushState({}, '', '?');
