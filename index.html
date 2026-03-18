@@ -957,8 +957,30 @@ async function openReleaseDetail(id) {
   const wF = !!(entry.pr.figureConcepts && entry.pr.figureConcepts.length);
   const wI = !!(entry.pr.significance && entry.pr.significance.length);
   const wQ = !!(entry.pr.quote);
+
+  // Hide the main output wrap and show detail content
+  const mainOutput = document.getElementById('outputWrap');
+  if (mainOutput) mainOutput.style.display = 'none';
+
+  // Set up the detail content area with all needed elements
   const content = document.getElementById('releaseDetailContent');
-  content.innerHTML = `<div id="prGrid" class="pr-grid"></div>`;
+  content.innerHTML = `
+    <div class="out-hdr">
+      <div>
+        <div class="out-eyebrow">生成されたプレスリリース原稿</div>
+        <div class="out-title" id="outTitle"></div>
+        <div class="out-meta">SPring-8 × SACLA プレスリリース生成システム · <span id="genTime"></span></div>
+      </div>
+      <div class="out-actions">
+        <button class="act-btn" onclick="doCopy()">⎘ コピー</button>
+        <button class="act-btn" onclick="window.print()">⎙ 印刷</button>
+        <button class="act-btn primary" onclick="closeReleaseDetail()">← 一覧に戻る</button>
+      </div>
+    </div>
+    <div class="edit-hint">テキストをクリックして直接編集できます</div>
+    <div class="pr-grid" id="prGrid"></div>
+  `;
+
   renderPR(entry.pr, wG, wF, wI, wQ);
 }
 
