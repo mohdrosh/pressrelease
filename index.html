@@ -318,8 +318,9 @@ footer{background:var(--ink);padding:36px 80px;display:flex;align-items:center;j
   </div>
   <div class="header-r">
     <span class="h-badge">PRESS RELEASE SYSTEM</span>
-<button class="h-btn" onclick="showSavedList()" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.25);margin-right:8px;">📁 保存済みリリース</button>
+    <button class="h-btn" onclick="showSavedList()" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.25);margin-right:8px;">📁 保存済みリリース</button>
     <button class="h-btn" onclick="document.getElementById('app').scrollIntoView({behavior:'smooth'})">今すぐ生成する →</button>
+    <button class="h-btn" id="loginBtn" onclick="isLoggedIn ? handleLogout() : showLoginModal()" style="background:var(--accent);margin-left:8px;">ログイン</button>
   </div>
 </header>
 
@@ -378,10 +379,10 @@ footer{background:var(--ink);padding:36px 80px;display:flex;align-items:center;j
       <button class="tog-btn" id="togTx" onclick="switchMode('text')">✏️ テキストを貼り付け</button>
     </div>
     <div class="upload-zone" id="uploadZone"
-         onclick="document.getElementById('fileInput').click()"
+         onclick="checkLoginBeforeUpload()"
          ondragover="event.preventDefault();this.classList.add('drag')"
          ondragleave="this.classList.remove('drag')"
-         ondrop="handleDrop(event)">
+         ondrop="if(checkLoginBeforeDrop(event))handleDrop(event)">
       <div class="uz-icon">📄</div>
       <div class="uz-title">ここにPDFをドロップ</div>
       <div class="uz-hint">ドラッグ＆ドロップ、またはクリックしてファイルを選択<br>対応形式：PDF・TXT・DOC</div>
@@ -440,6 +441,29 @@ footer{background:var(--ink);padding:36px 80px;display:flex;align-items:center;j
   </div>
 </div>
 
+<!-- LOGIN MODAL -->
+<div id="loginModal" style="display:none;position:fixed;inset:0;background:rgba(5,10,30,.85);z-index:700;align-items:center;justify-content:center;backdrop-filter:blur(8px);" onclick="if(event.target===this)hideLoginModal()">
+  <div style="background:#0d1528;border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:40px;width:360px;position:relative;">
+    <button onclick="hideLoginModal()" style="position:absolute;top:16px;right:16px;background:transparent;border:none;color:rgba(255,255,255,.4);font-size:18px;cursor:pointer;">✕</button>
+    <div style="font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent-bright);font-family:'DM Mono',monospace;margin-bottom:8px;">メンバーログイン</div>
+    <div style="font-family:'Noto Serif JP',serif;font-size:22px;font-weight:900;color:var(--white);margin-bottom:24px;">ログイン</div>
+    <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:6px;padding:12px 16px;margin-bottom:20px;font-size:11px;color:rgba(255,255,255,.4);font-family:'DM Mono',monospace;line-height:1.8;">
+      Demo: spring8 / press2025<br>
+      Demo: sacla / sacla2025
+    </div>
+    <div id="loginError" style="display:none;background:rgba(255,60,60,.1);border:1px solid rgba(255,60,60,.3);color:rgba(255,120,120,.9);padding:10px 14px;border-radius:4px;font-size:12px;margin-bottom:16px;">ユーザー名またはパスワードが違います</div>
+    <div style="margin-bottom:14px;">
+      <div style="font-size:11px;color:rgba(255,255,255,.4);margin-bottom:6px;font-family:'DM Mono',monospace;">ユーザー名</div>
+      <input id="loginUser" type="text" placeholder="username" onkeydown="if(event.key==='Enter')document.getElementById('loginPass').focus()" style="width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:4px;padding:10px 14px;color:var(--white);font-family:'Noto Sans JP',sans-serif;font-size:13px;outline:none;">
+    </div>
+    <div style="margin-bottom:24px;">
+      <div style="font-size:11px;color:rgba(255,255,255,.4);margin-bottom:6px;font-family:'DM Mono',monospace;">パスワード</div>
+      <input id="loginPass" type="password" placeholder="password" onkeydown="if(event.key==='Enter')handleLogin()" style="width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:4px;padding:10px 14px;color:var(--white);font-family:'Noto Sans JP',sans-serif;font-size:13px;outline:none;">
+    </div>
+    <button onclick="handleLogin()" style="width:100%;background:var(--accent);color:white;border:none;padding:13px;border-radius:4px;font-family:'Noto Sans JP',sans-serif;font-size:14px;font-weight:700;cursor:pointer;letter-spacing:.05em;transition:background .2s;" onmouseover="this.style.background='var(--accent-bright)'" onmouseout="this.style.background='var(--accent)'">ログイン →</button>
+  </div>
+</div>
+
 <!-- LOADING -->
 <div class="load-overlay" id="loadOverlay">
   <div class="load-ring"></div>
@@ -469,6 +493,74 @@ let inputMode='upload', paperText='';
 let glossaryData=[];
 let selectingForGloss=false;
 let glossMode='type';
+let isLoggedIn=false;
+
+// Demo credentials
+const USERS = [
+  { username: 'spring8', password: 'press2025' },
+  { username: 'sacla', password: 'sacla2025' }
+];
+
+function handleLogin(){
+  const u = document.getElementById('loginUser').value.trim();
+  const p = document.getElementById('loginPass').value.trim();
+  const match = USERS.find(x => x.username===u && x.password===p);
+  if(match){
+    isLoggedIn = true;
+    document.getElementById('loginModal').style.display = 'none';
+    document.getElementById('loginBtn').textContent = '👤 ' + u;
+    document.getElementById('loginBtn').style.background = 'rgba(255,255,255,.15)';
+    document.getElementById('loginError').style.display = 'none';
+    // If they were trying to upload, trigger the file input
+    if(pendingUpload){
+      pendingUpload = false;
+      document.getElementById('fileInput').click();
+    }
+  } else {
+    document.getElementById('loginError').style.display = 'block';
+  }
+}
+
+function handleLogout(){
+  isLoggedIn = false;
+  document.getElementById('loginBtn').textContent = 'ログイン';
+  document.getElementById('loginBtn').style.background = 'var(--accent)';
+}
+
+function showLoginModal(){
+  document.getElementById('loginUser').value = '';
+  document.getElementById('loginPass').value = '';
+  document.getElementById('loginError').style.display = 'none';
+  document.getElementById('loginModal').style.display = 'flex';
+}
+
+function hideLoginModal(){
+  document.getElementById('loginModal').style.display = 'none';
+  pendingUpload = false;
+}
+
+let pendingUpload = false;
+
+function checkLoginBeforeUpload(){
+  if(isLoggedIn){
+    document.getElementById('fileInput').click();
+  } else {
+    pendingUpload = true;
+    showLoginModal();
+  }
+}
+
+function checkLoginBeforeDrop(e){
+  if(!isLoggedIn){
+    e.preventDefault();
+    e.stopPropagation();
+    document.getElementById('uploadZone').classList.remove('drag');
+    pendingUpload = false;
+    showLoginModal();
+    return false;
+  }
+  return true;
+}
 
 // ── MODE SWITCH ───────────────────────────────────────────────
 function switchMode(m){
@@ -515,6 +607,7 @@ function resetSteps(){ ['ls1','ls2','ls3','ls4','ls5','ls6'].forEach(id=>{ const
 
 // ── GENERATE ─────────────────────────────────────────────────
 async function doGenerate(){
+  if(!isLoggedIn){ showLoginModal(); return; }
   const txt=inputMode==='text'?document.getElementById('paperTa').value.trim():paperText;
   if(!txt){ alert('論文のテキストをアップロードするか、テキストを貼り付けてください。'); return; }
 
