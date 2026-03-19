@@ -419,7 +419,7 @@ footer{background:var(--ink);padding:36px 80px;display:flex;align-items:center;j
     </div>
     <div class="out-actions">
       <button class="act-btn" onclick="doCopy()">⎘ コピー</button>
-<button class="act-btn" id="saveBtn" onclick="doSave()" style="background:#1a7a3c;color:white;border-color:#1a7a3c;">💾 保存する</button>
+<button class="act-btn" id="saveBtn" onclick="openCategoryModal()" style="background:#1a7a3c;color:white;border-color:#1a7a3c;">💾 保存する</button>
       <button class="act-btn" onclick="window.print()">⎙ 印刷</button>
 <button class="act-btn" id="pdfBtn" onclick="downloadPDF()">⬇ PDF保存</button>
       <button class="act-btn primary" onclick="doReset()">↻ 再生成</button>
@@ -439,7 +439,7 @@ footer{background:var(--ink);padding:36px 80px;display:flex;align-items:center;j
       </div>
       <button onclick="hideSavedList()" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.7);padding:10px 22px;border-radius:4px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;font-size:13px;">✕ 閉じる</button>
     </div>
-    <div style="display:flex;gap:12px;margin-bottom:24px;flex-wrap:wrap;align-items:center;">
+    <div style="display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap;align-items:center;">
       <input id="prSearch" type="text" placeholder="🔍 タイトル・機関名・著者名で検索…" oninput="renderSavedList()" style="flex:1;min-width:200px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);border-radius:4px;padding:10px 16px;color:var(--white);font-family:'Noto Sans JP',sans-serif;font-size:13px;outline:none;">
       <select id="prSortDate" onchange="renderSavedList()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);border-radius:4px;padding:10px 14px;color:rgba(255,255,255,.7);font-family:'Noto Sans JP',sans-serif;font-size:12px;cursor:pointer;">
         <option value="saved_desc">保存日：新しい順</option>
@@ -448,7 +448,47 @@ footer{background:var(--ink);padding:36px 80px;display:flex;align-items:center;j
         <option value="paper_asc">論文日：古い順</option>
       </select>
     </div>
+    <div style="display:flex;gap:12px;margin-bottom:24px;flex-wrap:wrap;align-items:center;">
+      <select id="prFilterCat" onchange="onCatFilterChange()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);border-radius:4px;padding:10px 14px;color:rgba(255,255,255,.7);font-family:'Noto Sans JP',sans-serif;font-size:12px;cursor:pointer;">
+        <option value="">すべてのカテゴリー</option>
+        <option value="生命科学・医学">生命科学・医学</option>
+        <option value="材料・デバイス">材料・デバイス</option>
+        <option value="環境・社会・生活">環境・社会・生活</option>
+        <option value="施設">施設</option>
+      </select>
+      <select id="prFilterSub" onchange="renderSavedList()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);border-radius:4px;padding:10px 14px;color:rgba(255,255,255,.7);font-family:'Noto Sans JP',sans-serif;font-size:12px;cursor:pointer;display:none;">
+        <option value="">すべてのサブカテゴリー</option>
+      </select>
+    </div>
     <div id="savedListContainer"></div>
+  </div>
+</div>
+
+<!-- CATEGORY MODAL -->
+<div id="categoryModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:700;display:none;align-items:center;justify-content:center;">
+  <div style="background:#0d1530;border:1px solid rgba(255,255,255,.15);border-radius:8px;padding:40px;max-width:480px;width:90%;font-family:'Noto Sans JP',sans-serif;">
+    <div style="font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent-bright);font-family:'DM Mono',monospace;margin-bottom:8px;">保存前に選択してください</div>
+    <div style="font-family:'Noto Serif JP',serif;font-size:22px;font-weight:900;color:var(--white);margin-bottom:28px;">カテゴリー分類</div>
+    <div style="margin-bottom:16px;">
+      <div style="font-size:11px;color:rgba(255,255,255,.5);margin-bottom:8px;letter-spacing:.06em;">カテゴリー <span style="color:#e05555;">*</span></div>
+      <select id="modalCat" onchange="onModalCatChange()" style="width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.2);border-radius:4px;padding:11px 14px;color:var(--white);font-family:'Noto Sans JP',sans-serif;font-size:13px;cursor:pointer;">
+        <option value="">選択してください</option>
+        <option value="生命科学・医学">生命科学・医学</option>
+        <option value="材料・デバイス">材料・デバイス</option>
+        <option value="環境・社会・生活">環境・社会・生活</option>
+        <option value="施設">施設</option>
+      </select>
+    </div>
+    <div style="margin-bottom:28px;">
+      <div style="font-size:11px;color:rgba(255,255,255,.5);margin-bottom:8px;letter-spacing:.06em;">サブカテゴリー <span style="color:#e05555;">*</span></div>
+      <select id="modalSub" style="width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.2);border-radius:4px;padding:11px 14px;color:rgba(255,255,255,.5);font-family:'Noto Sans JP',sans-serif;font-size:13px;cursor:pointer;" disabled>
+        <option value="">先にカテゴリーを選択</option>
+      </select>
+    </div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;">
+      <button onclick="closeCategoryModal()" style="padding:10px 22px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.6);border-radius:3px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;font-size:13px;">キャンセル</button>
+      <button onclick="confirmSave()" style="padding:10px 24px;background:var(--accent);color:white;border:none;border-radius:3px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;font-size:13px;font-weight:700;">💾 保存する</button>
+    </div>
   </div>
 </div>
 
@@ -961,19 +1001,50 @@ function doReset(){ document.getElementById('outputWrap').classList.remove('on')
 // ── SAVE / LOAD ───────────────────────────────────────────────
 let currentPR = null;
 
-async function doSave(){
+const CATEGORIES = {
+  '生命科学・医学': ['生命科学','創薬','医療・医薬'],
+  '材料・デバイス': ['金属素材','非金属素材','磁性物質','結晶構造・分子構造','半導体・エレクトロニクス'],
+  '環境・社会・生活': ['環境','くらし','エネルギー','品質管理・生産プロセス','地球・宇宙'],
+  '施設': ['加速器']
+};
+
+function openCategoryModal(){
   if(!currentPR){ alert('保存するプレスリリースがありません。'); return; }
+  document.getElementById('modalCat').value = '';
+  document.getElementById('modalSub').innerHTML = '<option value="">先にカテゴリーを選択</option>';
+  document.getElementById('modalSub').disabled = true;
+  document.getElementById('categoryModal').style.display = 'flex';
+}
+
+function closeCategoryModal(){
+  document.getElementById('categoryModal').style.display = 'none';
+}
+
+function onModalCatChange(){
+  const cat = document.getElementById('modalCat').value;
+  const sub = document.getElementById('modalSub');
+  if(!cat){ sub.innerHTML = '<option value="">先にカテゴリーを選択</option>'; sub.disabled=true; return; }
+  const subs = CATEGORIES[cat] || [];
+  sub.innerHTML = '<option value="">サブカテゴリーを選択</option>' + subs.map(s=>`<option value="${s}">${s}</option>`).join('');
+  sub.disabled = false;
+  sub.style.color = 'var(--white)';
+}
+
+async function confirmSave(){
+  const cat = document.getElementById('modalCat').value;
+  const sub = document.getElementById('modalSub').value;
+  if(!cat){ alert('カテゴリーを選択してください。'); return; }
+  if(!sub){ alert('サブカテゴリーを選択してください。'); return; }
+  closeCategoryModal();
   const btn = document.getElementById('saveBtn');
   btn.textContent = '⏳ 保存中…'; btn.disabled=true;
   try{
-    // Capture all edited content from the DOM
     const editedPR = {...currentPR};
     editedPR.title = document.getElementById('outTitle').textContent.trim() || currentPR.title;
     editedPR.summary = document.getElementById('pr-summary-txt')?.innerText.trim() || currentPR.summary;
     editedPR.background = document.getElementById('pr-background-txt')?.innerText.trim() || currentPR.background;
     editedPR.results = document.getElementById('pr-results-txt')?.innerText.trim() || currentPR.results;
     editedPR.future = document.getElementById('pr-future-txt')?.innerText.trim() || currentPR.future;
-    // Update glossary definitions if edited
     const glossItems = document.querySelectorAll('.gloss-def');
     if(editedPR.glossary && glossItems.length > 0){
       editedPR.glossary = editedPR.glossary.map((g, i) => ({
@@ -985,6 +1056,8 @@ async function doSave(){
       title: editedPR.title || 'タイトル未設定',
       institution: editedPR.institution || '',
       date: editedPR.date || '',
+      category: cat,
+      subcategory: sub,
       pr: editedPR
     };
     await fetch('https://pressrelease-tmo5.onrender.com/saves', {
@@ -1002,6 +1075,15 @@ async function doSave(){
 }
 
 let _allSaves = [];
+function onCatFilterChange(){
+  const cat = document.getElementById('prFilterCat').value;
+  const subEl = document.getElementById('prFilterSub');
+  if(!cat){ subEl.style.display='none'; subEl.value=''; renderSavedList(); return; }
+  const subs = CATEGORIES[cat] || [];
+  subEl.innerHTML = '<option value="">すべてのサブカテゴリー</option>' + subs.map(s=>`<option value="${s}">${s}</option>`).join('');
+  subEl.style.display = 'block';
+  renderSavedList();
+}
 async function showSavedList(){
   document.getElementById('savedPanel').style.display = 'block';
   document.body.style.overflow = 'hidden';
@@ -1018,7 +1100,11 @@ function renderSavedList(){
     container2.innerHTML = `<div style="text-align:center;padding:80px 0;color:rgba(255,255,255,.3);font-size:14px;font-weight:300;">まだ保存されたプレスリリースはありません。<br><br><span style="font-size:12px;">生成後に「💾 保存する」ボタンで保存できます。</span></div>`;
     return;
   }
+  const filterCat = document.getElementById('prFilterCat')?.value || '';
+  const filterSub = document.getElementById('prFilterSub')?.value || '';
   let list = _allSaves.filter(s => {
+    if(filterCat && (s.category||'') !== filterCat) return false;
+    if(filterSub && (s.subcategory||'') !== filterSub) return false;
     if(!q) return true;
     const authors = (s.pr?.paperInfo?.authors || '').toLowerCase();
     return (s.title||'').toLowerCase().includes(q)
@@ -1049,6 +1135,7 @@ function renderSavedList(){
           <div style="font-size:9px;font-family:'DM Mono',monospace;letter-spacing:.15em;color:var(--accent-bright);text-transform:uppercase;margin-bottom:8px;">📄 保存日時：${new Date(s.savedAt).toLocaleString('ja-JP')}</div>
           <div style="font-family:'Noto Serif JP',serif;font-size:18px;font-weight:700;color:var(--white);margin-bottom:6px;line-height:1.4;">${s.title}</div>
           <div style="font-size:12px;color:rgba(255,255,255,.35);font-weight:300;">${s.institution}${s.institution&&s.date?' · ':''}${s.date}</div>
+          ${s.category ? `<div style="margin-top:8px;display:inline-flex;gap:6px;align-items:center;"><span style="font-size:9px;letter-spacing:.1em;text-transform:uppercase;background:rgba(74,144,226,.15);color:var(--accent-bright);border:1px solid rgba(74,144,226,.25);padding:3px 8px;border-radius:2px;font-family:'DM Mono',monospace;">${s.category}</span><span style="font-size:9px;color:rgba(255,255,255,.3);font-family:'DM Mono',monospace;">${s.subcategory||''}</span></div>` : '<div style="margin-top:8px;font-size:9px;color:rgba(255,255,255,.2);font-family:\'DM Mono\',monospace;">未分類</div>'}
         </div>
         <div style="display:flex;gap:8px;align-items:center;flex-shrink:0;">
           <button onclick="event.stopPropagation();loadSavedPR('${s._id}')" style="padding:8px 18px;background:var(--accent);color:white;border:none;border-radius:3px;font-size:12px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;">開く</button>
