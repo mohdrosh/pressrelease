@@ -439,6 +439,15 @@ footer{background:var(--ink);padding:36px 80px;display:flex;align-items:center;j
       </div>
       <button onclick="hideSavedList()" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.7);padding:10px 22px;border-radius:4px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;font-size:13px;">✕ 閉じる</button>
     </div>
+    <div style="display:flex;gap:12px;margin-bottom:24px;flex-wrap:wrap;align-items:center;">
+      <input id="prSearch" type="text" placeholder="🔍 タイトル・機関名・著者名で検索…" oninput="renderSavedList()" style="flex:1;min-width:200px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);border-radius:4px;padding:10px 16px;color:var(--white);font-family:'Noto Sans JP',sans-serif;font-size:13px;outline:none;">
+      <select id="prSortDate" onchange="renderSavedList()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);border-radius:4px;padding:10px 14px;color:rgba(255,255,255,.7);font-family:'Noto Sans JP',sans-serif;font-size:12px;cursor:pointer;">
+        <option value="saved_desc">保存日：新しい順</option>
+        <option value="saved_asc">保存日：古い順</option>
+        <option value="paper_desc">論文日：新しい順</option>
+        <option value="paper_asc">論文日：古い順</option>
+      </select>
+    </div>
     <div id="savedListContainer"></div>
   </div>
 </div>
@@ -992,30 +1001,61 @@ async function doSave(){
   }
 }
 
+let _allSaves = [];
 async function showSavedList(){
-  const container2 = document.getElementById('savedListContainer');
-  container2.innerHTML = '<div style="text-align:center;padding:80px 0;color:rgba(255,255,255,.3);">読み込み中…</div>';
   document.getElementById('savedPanel').style.display = 'block';
   document.body.style.overflow = 'hidden';
-  const saves = await fetch('https://pressrelease-tmo5.onrender.com/saves').then(r=>r.json()).catch(()=>[]);
-  if(saves.length === 0){
+  const container2 = document.getElementById('savedListContainer');
+  container2.innerHTML = '<div style="text-align:center;padding:80px 0;color:rgba(255,255,255,.3);">読み込み中…</div>';
+  _allSaves = await fetch('https://pressrelease-tmo5.onrender.com/saves').then(r=>r.json()).catch(()=>[]);
+  renderSavedList();
+}
+function renderSavedList(){
+  const container2 = document.getElementById('savedListContainer');
+  const q = (document.getElementById('prSearch')?.value || '').toLowerCase();
+  const sort = document.getElementById('prSortDate')?.value || 'saved_desc';
+  if(_allSaves.length === 0){
     container2.innerHTML = `<div style="text-align:center;padding:80px 0;color:rgba(255,255,255,.3);font-size:14px;font-weight:300;">まだ保存されたプレスリリースはありません。<br><br><span style="font-size:12px;">生成後に「💾 保存する」ボタンで保存できます。</span></div>`;
-  } else {
-    container2.innerHTML = saves.map((s)=>`
-      <div style="border:1px solid rgba(255,255,255,.1);border-radius:6px;padding:28px 32px;margin-bottom:16px;background:rgba(255,255,255,.03);cursor:pointer;transition:background .2s;" onmouseover="this.style.background='rgba(255,255,255,.06)'" onmouseout="this.style.background='rgba(255,255,255,.03)'" onclick="loadSavedPR('${s._id}')">
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;">
-          <div style="flex:1;">
-            <div style="font-size:9px;font-family:'DM Mono',monospace;letter-spacing:.15em;color:var(--accent-bright);text-transform:uppercase;margin-bottom:8px;">📄 保存日時：${new Date(s.savedAt).toLocaleString('ja-JP')}</div>
-            <div style="font-family:'Noto Serif JP',serif;font-size:18px;font-weight:700;color:var(--white);margin-bottom:6px;line-height:1.4;">${s.title}</div>
-            <div style="font-size:12px;color:rgba(255,255,255,.35);font-weight:300;">${s.institution}${s.institution&&s.date?' · ':''}${s.date}</div>
-          </div>
-          <div style="display:flex;gap:8px;align-items:center;flex-shrink:0;">
-            <button onclick="event.stopPropagation();loadSavedPR('${s._id}')" style="padding:8px 18px;background:var(--accent);color:white;border:none;border-radius:3px;font-size:12px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;">開く</button>
-            <button onclick="event.stopPropagation();deleteSavedPR('${s._id}')" style="padding:8px 14px;background:rgba(255,60,60,.15);color:rgba(255,100,100,.8);border:1px solid rgba(255,60,60,.2);border-radius:3px;font-size:12px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;">削除</button>
-          </div>
-        </div>
-      </div>`).join('');
+    return;
   }
+  let list = _allSaves.filter(s => {
+    if(!q) return true;
+    const authors = (s.pr?.paperInfo?.authors || '').toLowerCase();
+    return (s.title||'').toLowerCase().includes(q)
+        || (s.institution||'').toLowerCase().includes(q)
+        || authors.includes(q);
+  });
+  const parseJapaneseDate = (str) => {
+    if(!str) return 0;
+    const m = str.match(/(\d{4})年(\d{1,2})月(\d{1,2})日/);
+    if(m) return new Date(m[1], m[2]-1, m[3]).getTime();
+    return new Date(str).getTime() || 0;
+  };
+  list.sort((a,b) => {
+    if(sort === 'saved_desc') return new Date(b.savedAt) - new Date(a.savedAt);
+    if(sort === 'saved_asc')  return new Date(a.savedAt) - new Date(b.savedAt);
+    if(sort === 'paper_desc') return parseJapaneseDate(b.date) - parseJapaneseDate(a.date);
+    if(sort === 'paper_asc')  return parseJapaneseDate(a.date) - parseJapaneseDate(b.date);
+    return 0;
+  });
+  if(list.length === 0){
+    container2.innerHTML = `<div style="text-align:center;padding:60px 0;color:rgba(255,255,255,.3);font-size:14px;">該当するリリースが見つかりませんでした。</div>`;
+    return;
+  }
+  container2.innerHTML = list.map((s)=>`
+    <div style="border:1px solid rgba(255,255,255,.1);border-radius:6px;padding:28px 32px;margin-bottom:16px;background:rgba(255,255,255,.03);cursor:pointer;transition:background .2s;" onmouseover="this.style.background='rgba(255,255,255,.06)'" onmouseout="this.style.background='rgba(255,255,255,.03)'" onclick="loadSavedPR('${s._id}')">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+        <div style="flex:1;">
+          <div style="font-size:9px;font-family:'DM Mono',monospace;letter-spacing:.15em;color:var(--accent-bright);text-transform:uppercase;margin-bottom:8px;">📄 保存日時：${new Date(s.savedAt).toLocaleString('ja-JP')}</div>
+          <div style="font-family:'Noto Serif JP',serif;font-size:18px;font-weight:700;color:var(--white);margin-bottom:6px;line-height:1.4;">${s.title}</div>
+          <div style="font-size:12px;color:rgba(255,255,255,.35);font-weight:300;">${s.institution}${s.institution&&s.date?' · ':''}${s.date}</div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;flex-shrink:0;">
+          <button onclick="event.stopPropagation();loadSavedPR('${s._id}')" style="padding:8px 18px;background:var(--accent);color:white;border:none;border-radius:3px;font-size:12px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;">開く</button>
+          <button onclick="event.stopPropagation();deleteSavedPR('${s._id}')" style="padding:8px 14px;background:rgba(255,60,60,.15);color:rgba(255,100,100,.8);border:1px solid rgba(255,60,60,.2);border-radius:3px;font-size:12px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;">削除</button>
+        </div>
+      </div>
+    </div>`).join('');
 }
 
 function hideSavedList(){
