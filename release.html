@@ -197,13 +197,18 @@ async function submitPR(){
   const btn = document.getElementById('submitBtn');
   btn.textContent = '⏳ 申請中…'; btn.disabled = true;
   try{
-    // Read edited content from DOM
+    // Read edited content from DOM — merge with original PR to preserve all fields
+    const saves = await fetch('https://pressrelease-tmo5.onrender.com/saves').then(r=>r.json());
+    const original = saves.find(s=>s._id===currentId);
+    const originalPR = original ? original.pr : {};
+
     const editedPR = {
+      ...originalPR,
       title: document.getElementById('outTitle').textContent.trim(),
-      summary: document.getElementById('pr-summary-txt')?.innerText.trim(),
-      background: document.getElementById('pr-background-txt')?.innerText.trim(),
-      results: document.getElementById('pr-results-txt')?.innerText.trim(),
-      future: document.getElementById('pr-future-txt')?.innerText.trim(),
+      summary: document.getElementById('pr-summary-txt')?.innerText.trim() || originalPR.summary,
+      background: document.getElementById('pr-background-txt')?.innerText.trim() || originalPR.background,
+      results: document.getElementById('pr-results-txt')?.innerText.trim() || originalPR.results,
+      future: document.getElementById('pr-future-txt')?.innerText.trim() || originalPR.future,
     };
 
     // PATCH the saved entry with edited content + status pending
