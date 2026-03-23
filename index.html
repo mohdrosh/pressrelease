@@ -1139,7 +1139,6 @@ function renderSavedList(){
         </div>
         <div style="display:flex;gap:8px;align-items:center;flex-shrink:0;">
           <button onclick="event.stopPropagation();loadSavedPR('${s._id}')" style="padding:8px 18px;background:var(--accent);color:white;border:none;border-radius:3px;font-size:12px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;">開く</button>
-          <button onclick="event.stopPropagation();deleteSavedPR('${s._id}')" style="padding:8px 14px;background:rgba(255,60,60,.15);color:rgba(255,100,100,.8);border:1px solid rgba(255,60,60,.2);border-radius:3px;font-size:12px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;">削除</button>
         </div>
       </div>
     </div>`).join('');
