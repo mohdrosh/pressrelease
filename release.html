@@ -347,7 +347,7 @@ window.addEventListener('load', async () => {
     return;
   }
   try{
-    const saves = await fetch('https://publicchemical.spring8.or.jp/pressrelease/saves').then(r=>r.json());
+    const saves = await fetch('https://pressrelease-tmo5.onrender.com/saves').then(r=>r.json());
     const entry = saves.find(s=>s._id===id);
     if(!entry){
       document.getElementById('loadingDiv').textContent = 'プレスリリースが見つかりません。';
