@@ -312,6 +312,13 @@ function renderPR(pr){
 
   if(wG) applyAllGlossRefs();
 
+  // Show submit button only for drafts
+  if(currentStatus === 'draft'){
+    document.getElementById('submitBtn').style.display = '';
+  } else {
+    document.getElementById('submitBtn').style.display = 'none';
+  }
+
   document.getElementById('loadingDiv').style.display = 'none';
   document.getElementById('mainContent').style.display = 'block';
 }
@@ -403,12 +410,6 @@ window.addEventListener('load', async () => {
     currentId = id;
     currentStatus = entry.status || 'draft';
     renderPR(entry.pr);
-    // Show submit button only for drafts
-    if(currentStatus === 'draft'){
-      document.getElementById('submitBtn').style.display = '';
-    } else {
-      document.getElementById('submitBtn').style.display = 'none';
-    }
   }catch(e){
     document.getElementById('loadingDiv').textContent = '読み込みに失敗しました。';
   }
