@@ -406,6 +406,8 @@ window.addEventListener('load', async () => {
     // Show submit button only for drafts
     if(currentStatus === 'draft'){
       document.getElementById('submitBtn').style.display = '';
+    } else {
+      document.getElementById('submitBtn').style.display = 'none';
     }
   }catch(e){
     document.getElementById('loadingDiv').textContent = '読み込みに失敗しました。';
