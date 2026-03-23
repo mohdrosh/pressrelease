@@ -1260,10 +1260,22 @@ window.addEventListener('load', async () => {
   const urlParams = new URLSearchParams(window.location.search);
   const releaseId = urlParams.get('id');
   const view = urlParams.get('view');
+  const autoload = urlParams.get('autoload');
   if (releaseId) {
     await loadSavedPR(releaseId);
   } else if (view === 'releases') {
     showSavedList();
+  } else if (autoload === '1') {
+    const stored = localStorage.getItem('autoload_pr');
+    if (stored) {
+      try {
+        const pr = JSON.parse(stored);
+        localStorage.removeItem('autoload_pr');
+        renderPR(pr, true, true, true, true);
+      } catch(e) {
+        console.error('Autoload failed:', e);
+      }
+    }
   }
 });
 function demoPR(){
