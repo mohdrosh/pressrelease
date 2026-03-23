@@ -123,6 +123,7 @@
         <button class="act-btn" onclick="doCopy()">⎘ コピー</button>
         <button class="act-btn" onclick="window.print()">⎙ 印刷</button>
         <button class="act-btn" id="pdfBtn" onclick="downloadPDF()">⬇ PDF保存</button>
+        <button class="act-btn" id="submitBtn" onclick="submitPR()" style="background:#2e6fc4;color:white;border-color:#2e6fc4;display:none;">申請する</button>
         <a href="/" class="act-btn primary">← 一覧に戻る</a>
       </div>
     </div>
@@ -138,6 +139,8 @@
 
 <script>
 let glossaryData = [];
+let currentId = null;
+let currentStatus = null;
 
 function toFullWidth(n){
   const map={'1':'１','2':'２','3':'３','4':'４','5':'５','6':'６','7':'７','8':'８','9':'９','0':'０'};
@@ -187,6 +190,45 @@ function jumpToGloss(index){
 function doCopy(){
   navigator.clipboard.writeText(document.getElementById('prGrid').innerText);
   alert('クリップボードにコピーしました。');
+}
+
+async function submitPR(){
+  if(!currentId){ alert('IDが見つかりません。'); return; }
+  const btn = document.getElementById('submitBtn');
+  btn.textContent = '⏳ 申請中…'; btn.disabled = true;
+  try{
+    // Read edited content from DOM
+    const editedPR = {
+      title: document.getElementById('outTitle').textContent.trim(),
+      summary: document.getElementById('pr-summary-txt')?.innerText.trim(),
+      background: document.getElementById('pr-background-txt')?.innerText.trim(),
+      results: document.getElementById('pr-results-txt')?.innerText.trim(),
+      future: document.getElementById('pr-future-txt')?.innerText.trim(),
+    };
+
+    // PATCH the saved entry with edited content + status pending
+    const res = await fetch(`https://pressrelease-tmo5.onrender.com/saves/${currentId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        status: 'pending',
+        pr: editedPR,
+        title: editedPR.title,
+      })
+    });
+    const data = await res.json();
+    if(!data.success) throw new Error('申請に失敗しました');
+
+    btn.textContent = '✅ 申請済み';
+    btn.style.background = '#1a7a3c';
+    btn.style.borderColor = '#1a7a3c';
+    btn.disabled = true;
+    alert('申請が完了しました！審査担当者が確認次第、結果をお知らせします。');
+  } catch(e){
+    alert('申請に失敗しました: ' + e.message);
+    btn.textContent = '申請する';
+    btn.disabled = false;
+  }
 }
 
 function renderPR(pr){
@@ -353,7 +395,13 @@ window.addEventListener('load', async () => {
       document.getElementById('loadingDiv').textContent = 'プレスリリースが見つかりません。';
       return;
     }
+    currentId = id;
+    currentStatus = entry.status || 'draft';
     renderPR(entry.pr);
+    // Show submit button only for drafts
+    if(currentStatus === 'draft'){
+      document.getElementById('submitBtn').style.display = '';
+    }
   }catch(e){
     document.getElementById('loadingDiv').textContent = '読み込みに失敗しました。';
   }
