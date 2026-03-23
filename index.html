@@ -319,6 +319,7 @@ footer{background:var(--ink);padding:36px 80px;display:flex;align-items:center;j
   <div class="header-r">
     <span class="h-badge">PRESS RELEASE SYSTEM</span>
     <button class="h-btn" onclick="showSavedList()" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.25);margin-right:8px;">📁 保存済みリリース</button>
+    <button class="h-btn" onclick="showApprovedList()" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.25);margin-right:8px;">📰 公開済みリリース</button>
     <button class="h-btn" onclick="document.getElementById('app').scrollIntoView({behavior:'smooth'})">今すぐ生成する →</button>
     <button class="h-btn" id="loginBtn" onclick="isLoggedIn ? null : showLoginModal()" style="background:var(--accent);margin-left:8px;">ログイン</button>
     <span id="welcomeMsg" style="display:none;font-size:12px;color:rgba(255,255,255,.7);font-family:'Noto Sans JP',sans-serif;margin-left:8px;"></span>
@@ -402,10 +403,7 @@ footer{background:var(--ink);padding:36px 80px;display:flex;align-items:center;j
       <div class="opt-card on" id="o-impact" onclick="this.classList.toggle('on')"><div class="opt-chk">✓</div><div class="opt-ico">🌍</div><div class="opt-ttl">社会的意義</div><div class="opt-sub">社会への波及効果を分析</div></div>
       <div class="opt-card on" id="o-quote" onclick="this.classList.toggle('on')"><div class="opt-chk">✓</div><div class="opt-ico">💬</div><div class="opt-ttl">研究者コメント</div><div class="opt-sub">談話コメントの案を生成</div></div>
     </div>
-    <div style="text-align:center;margin-bottom:16px;">
-  <button onclick="showApprovedList()" style="background:transparent;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.7);padding:10px 24px;border-radius:4px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;font-size:13px;letter-spacing:.05em;">📰 公開済みプレスリリースを見る</button>
-</div>
-<button class="gen-btn" id="genBtn" onclick="doGenerate()">
+    <button class="gen-btn" id="genBtn" onclick="doGenerate()">
       <div class="gen-spin" id="genSpin"></div>
       <span id="genTxt">✦ プレスリリースを自動生成する</span>
     </button>
