@@ -1118,6 +1118,7 @@ function renderSavedList(){
   const filterCat = document.getElementById('prFilterCat')?.value || '';
   const filterSub = document.getElementById('prFilterSub')?.value || '';
   let list = _allSaves.filter(s => {
+    if(s.status === 'approved' || s.status === 'rejected') return false;
     if(filterCat && (s.category||'') !== filterCat) return false;
     if(filterSub && (s.subcategory||'') !== filterSub) return false;
     if(!q) return true;
