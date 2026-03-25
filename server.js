@@ -184,5 +184,10 @@ const server = http.createServer(async (req, res) => {
     }
   });
 });
-
+setInterval(() => {
+  https.get('https://pressrelease-tmo5.onrender.com/health', (res) => {
+    console.log('Keep-alive ping:', res.statusCode);
+  }).on('error', () => {});
+}, 840000);
+ // ping every 14 minutes
 server.listen(PORT, () => console.log(`✅ Gemini proxy running at http://localhost:${PORT}`));
