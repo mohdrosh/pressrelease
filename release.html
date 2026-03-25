@@ -198,7 +198,7 @@ async function submitPR(){
   btn.textContent = '⏳ 申請中…'; btn.disabled = true;
   try{
     // Read edited content from DOM — merge with original PR to preserve all fields
-    const saves = await fetch('https://pressrelease-tmo5.onrender.com/saves').then(r=>r.json());
+    const saves = await fetch('https://publicchemical.spring8.or.jp/pressrelease/saves').then(r=>r.json());
     const original = saves.find(s=>s._id===currentId);
     const originalPR = original ? original.pr : {};
 
@@ -212,7 +212,7 @@ async function submitPR(){
     };
 
     // PATCH the saved entry with edited content + status pending
-    const res = await fetch(`https://pressrelease-tmo5.onrender.com/saves/${currentId}`, {
+    const res = await fetch(`https://publicchemical.spring8.or.jp/pressrelease/saves/${currentId}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -401,7 +401,7 @@ window.addEventListener('load', async () => {
     return;
   }
   try{
-    const saves = await fetch('https://pressrelease-tmo5.onrender.com/saves').then(r=>r.json());
+    const saves = await fetch('https://publicchemical.spring8.or.jp/pressrelease/saves').then(r=>r.json());
     const entry = saves.find(s=>s._id===id);
     if(!entry){
       document.getElementById('loadingDiv').textContent = 'プレスリリースが見つかりません。';
