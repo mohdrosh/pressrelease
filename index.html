@@ -1164,7 +1164,6 @@ function renderSavedList(){
           <span style="padding:6px 14px;background:rgba(26,122,60,.2);color:rgba(100,220,130,.9);border:1px solid rgba(26,122,60,.4);border-radius:3px;font-size:12px;font-family:'Noto Sans JP',sans-serif;">✅ 承認済み</span>
         ` : `
           <button onclick="approvePR('${s._id}')" style="padding:7px 14px;background:rgba(26,122,60,.2);color:rgba(100,220,130,.9);border:1px solid rgba(26,122,60,.4);border-radius:3px;font-size:12px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;">✅ 承認</button>
-          <button onclick="deleteSavedPR('${s._id}')" style="padding:7px 14px;background:rgba(255,60,60,.15);color:rgba(255,100,100,.8);border:1px solid rgba(255,60,60,.2);border-radius:3px;font-size:12px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;">❌ 却下</button>
         `}
       </div>
     </div>`).join('');
