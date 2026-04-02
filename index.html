@@ -717,7 +717,7 @@ async function doGenerate(){
 
   let pr;
   try{
-    const res=await fetch('https://publicchemical.spring8.or.jp/pressrelease',{
+    const res=await fetch('https://pressrelease-tmo5.onrender.com',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
@@ -1075,7 +1075,7 @@ async function confirmSave(){
       subcategory: sub,
       pr: editedPR
     };
-    await fetch('https://publicchemical.spring8.or.jp/pressrelease/saves', {
+    await fetch('https://pressrelease-tmo5.onrender.com/saves', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(entry)
@@ -1105,7 +1105,7 @@ async function showSavedList(){
   document.body.style.overflow = 'hidden';
   const container2 = document.getElementById('savedListContainer');
   container2.innerHTML = '<div style="text-align:center;padding:80px 0;color:rgba(255,255,255,.3);">読み込み中…</div>';
-  _allSaves = await fetch('https://publicchemical.spring8.or.jp/pressrelease/saves').then(r=>r.json()).catch(()=>[]);
+  _allSaves = await fetch('https://pressrelease-tmo5.onrender.com/saves').then(r=>r.json()).catch(()=>[]);
   renderSavedList();
 }
 function renderSavedList(){
@@ -1180,7 +1180,7 @@ async function showApprovedList(){
   const container = document.getElementById('approvedListContainer');
   container.innerHTML = '<div style="text-align:center;padding:80px 0;color:rgba(255,255,255,.3);">読み込み中…</div>';
   try{
-    _allApproved = await fetch('https://publicchemical.spring8.or.jp/pressrelease/saves/approved').then(r=>r.json());
+    _allApproved = await fetch('https://pressrelease-tmo5.onrender.com/saves/approved').then(r=>r.json());
     renderApprovedList();
   }catch(e){
     container.innerHTML = '<div style="text-align:center;padding:60px 0;color:rgba(255,255,255,.3);">読み込みに失敗しました。</div>';
@@ -1254,12 +1254,12 @@ function hideApprovedList(){
 }
 
 async function loadSavedPR(id){
-  window.open(`/pressrelease/release.html?id=${id}`, '_blank');
+  window.open(`/release.html?id=${id}`, '_blank');
 }
 
 async function approvePR(id){
   if(!confirm('このプレスリリースを承認しますか？')) return;
-  await fetch(`https://publicchemical.spring8.or.jp/pressrelease/saves/${id}`, {
+  await fetch(`https://pressrelease-tmo5.onrender.com/saves/${id}`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ status: 'approved' })
@@ -1269,7 +1269,7 @@ async function approvePR(id){
 
 async function deleteSavedPR(id){
   if(!confirm('このプレスリリースを却下しますか？')) return;
-  await fetch(`https://publicchemical.spring8.or.jp/pressrelease/saves/${id}`, {
+  await fetch(`https://pressrelease-tmo5.onrender.com/saves/${id}`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ status: 'rejected' })

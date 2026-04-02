@@ -106,7 +106,7 @@
 
 <header class="pr-header">
   <div class="pr-header-logo">SPring-8 <em>×</em> SACLA</div>
-  <a href="/pressrelease/" class="pr-header-back">← 一覧に戻る</a>
+  <a href="/" class="pr-header-back">← 一覧に戻る</a>
 </header>
 
 <div id="loadingDiv" class="loading">読み込み中…</div>
@@ -198,7 +198,7 @@ async function submitPR(){
   btn.textContent = '⏳ 申請中…'; btn.disabled = true;
   try{
     // Read edited content from DOM — merge with original PR to preserve all fields
-    const saves = await fetch('https://publicchemical.spring8.or.jp/pressrelease/saves').then(r=>r.json());
+    const saves = await fetch('https://pressrelease-tmo5.onrender.com/saves').then(r=>r.json());
     const original = saves.find(s=>s._id===currentId);
     const originalPR = original ? original.pr : {};
 
